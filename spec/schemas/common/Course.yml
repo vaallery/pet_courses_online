@@ -1,0 +1,36 @@
+required: [id,name,description,active,author_id,created_at,updated_at,author,competition_ids]
+properties:
+  id:
+    description: ''
+    readOnly: true
+    type: number
+  name:
+    description: ''
+    type: string
+  description:
+    description: ''
+    type: [string, 'null']
+  active:
+    description: ''
+    type: boolean
+  author_id:
+    description: ''
+    type: number
+  created_at:
+    description: ''
+    readOnly: true
+    type: string
+    format: date-time
+  updated_at:
+    description: ''
+    readOnly: true
+    type: string
+    format: date-time
+  competition_ids:
+    type: array
+    items:
+      type: integer
+  author:
+    allOf:
+      - readOnly: true
+      - "$ref": "#/components/schemas/Author"

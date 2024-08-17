@@ -1,14 +1,23 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  mount Rswag::Ui::Engine => "/"
+  mount Rswag::Api::Engine => "/api-docs"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  resources :unlock_accounts, controller: "rails_jwt_auth/unlock_accounts", only: %i[update]
+  resources :invitations, controller: "rails_jwt_auth/invitations", only: [ :show, :create, :update ]
+  resources :reset_passwords, controller: "rails_jwt_auth/reset_passwords", only: [ :show, :create, :update ]
+  resources :confirmations, controller: "rails_jwt_auth/confirmations", only: [ :create, :update ]
 
-  # Render dynamic PWA files from app/views/pwa/*
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  resource :profile, controller: "rails_jwt_auth/profiles", only: %i[show update] do
+    collection do
+      put :email
+      put :password
+    end
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  resource :registration, controller: "rails_jwt_auth/registrations", only: [ :create ]
+  resource :session, controller: "rails_jwt_auth/sessions", only: [ :create, :destroy ]
+
+  resources :competitions
+  resources :courses
+  resources :authors
 end

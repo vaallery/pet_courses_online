@@ -1,0 +1,2 @@
+class AuthorsFilter < BaseFilter
+end

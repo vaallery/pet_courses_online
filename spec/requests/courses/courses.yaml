@@ -1,0 +1,37 @@
+---
+openapi: 3.1.0
+info:
+  title: Courses API
+  version: v1
+  description: |
+    Апи для учебного проекта Курсы
+tags: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        В поле Value необходимо записать JWT-токен, который возвращается
+        при запросе на авторизацию. Авторизация в среде разработки выполняется следующим способом:<br>
+        Выполнить команду в консоли:<br>
+        ```bash
+        curl -s -H "Content-Type: application/json" \
+          -XPOST http://localhost:3000/session \
+          --data '{"email":"user@example.com","password":"secret"}'
+        ```
+        скопировать содержимое jwt в поле Authorization
+  schemas: {}
+security:
+  - bearerAuth: []
+paths: {}
+servers:
+  - url: http://{host}:{port}
+    description: Development server
+    variables:
+      host:
+        default: localhost
+      port:
+        default: '3000'
+

@@ -1,0 +1,2 @@
+class CoursesFilter < BaseFilter
+end

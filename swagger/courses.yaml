@@ -1,0 +1,687 @@
+---
+openapi: 3.1.0
+info:
+  title: Courses API
+  version: v1
+  description: 'Апи для учебного проекта Курсы
+
+    '
+tags: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        В поле Value необходимо записать JWT-токен, который возвращается
+        при запросе на авторизацию. Авторизация в среде разработки выполняется следующим способом:<br>
+        Выполнить команду в консоли:<br>
+        ```bash
+        curl -s -H "Content-Type: application/json" \
+          -XPOST http://localhost:3000/session \
+          --data '{"email":"user@example.com","password":"secret"}'
+        ```
+        скопировать содержимое jwt в поле Authorization
+  schemas:
+    Author:
+      required:
+      - id
+      - name
+      - description
+      - active
+      - created_at
+      - updated_at
+      - course_ids
+      properties:
+        id:
+          description: ''
+          readOnly: true
+          type: number
+        name:
+          description: ''
+          type: string
+        description:
+          description: ''
+          type:
+          - string
+          - 'null'
+        active:
+          description: ''
+          type: boolean
+        created_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        updated_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        course_ids:
+          type: array
+          readOnly: true
+          items:
+            type: integer
+    Competition:
+      required:
+      - id
+      - name
+      - description
+      - active
+      - created_at
+      - updated_at
+      - course_ids
+      properties:
+        id:
+          description: ''
+          readOnly: true
+          type: number
+        name:
+          description: ''
+          type: string
+        description:
+          description: ''
+          type:
+          - string
+          - 'null'
+        active:
+          description: ''
+          type: boolean
+        created_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        updated_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        course_ids:
+          type: array
+          readOnly: true
+          items:
+            type: integer
+    Course:
+      required:
+      - id
+      - name
+      - description
+      - active
+      - author_id
+      - created_at
+      - updated_at
+      - author
+      - competition_ids
+      properties:
+        id:
+          description: ''
+          readOnly: true
+          type: number
+        name:
+          description: ''
+          type: string
+        description:
+          description: ''
+          type:
+          - string
+          - 'null'
+        active:
+          description: ''
+          type: boolean
+        author_id:
+          description: ''
+          type: number
+        created_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        updated_at:
+          description: ''
+          readOnly: true
+          type: string
+          format: date-time
+        competition_ids:
+          type: array
+          items:
+            type: integer
+        author:
+          allOf:
+          - readOnly: true
+          - "$ref": "#/components/schemas/Author"
+security:
+- bearerAuth: []
+paths:
+  "/authors":
+    get:
+      summary: list authors
+      tags:
+      - Authors
+      parameters:
+      - name: search
+        in: query
+        required: false
+        description: Строка для поиска ресурса (часть имени, как пример). Игнорируется
+          если указан filter
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: Ограничение кол-ва записей на странице.(100)
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        description: Номер страницы
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        required: false
+        description: Поле по которому производится сортировка.
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        description: Направление сортировки [asc | desc]. По умолчанию asc. Игнорируется
+          если указан order
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - authors
+                properties:
+                  authors:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/Author"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    post:
+      summary: create author
+      tags:
+      - Authors
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - author
+                properties:
+                  author:
+                    "$ref": "#/components/schemas/Author"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                author:
+                  "$ref": "#/components/schemas/Author"
+        description: Модель Author
+  "/authors/{id}":
+    get:
+      summary: show author
+      tags:
+      - Authors
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  author:
+                    "$ref": "#/components/schemas/Author"
+                required:
+                - author
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    patch:
+      summary: update author
+      tags:
+      - Authors
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  author:
+                    "$ref": "#/components/schemas/Author"
+                required:
+                - author
+        '400':
+          description: " Недопустимые параметры"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                author:
+                  "$ref": "#/components/schemas/Author"
+        description: Модель Author
+    delete:
+      summary: delete author
+      tags:
+      - Authors
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+  "/competitions":
+    get:
+      summary: list competitions
+      tags:
+      - Competitions
+      parameters:
+      - name: search
+        in: query
+        required: false
+        description: Строка для поиска ресурса (часть имени, как пример). Игнорируется
+          если указан filter
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: Ограничение кол-ва записей на странице.(100)
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        description: Номер страницы
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        required: false
+        description: Поле по которому производится сортировка.
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        description: Направление сортировки [asc | desc]. По умолчанию asc. Игнорируется
+          если указан order
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - competitions
+                properties:
+                  competitions:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/Competition"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    post:
+      summary: create competition
+      tags:
+      - Competitions
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - competition
+                properties:
+                  competition:
+                    "$ref": "#/components/schemas/Competition"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                competition:
+                  "$ref": "#/components/schemas/Competition"
+        description: Модель Competition
+  "/competitions/{id}":
+    get:
+      summary: show competition
+      tags:
+      - Competitions
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  competition:
+                    "$ref": "#/components/schemas/Competition"
+                required:
+                - competition
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    patch:
+      summary: update competition
+      tags:
+      - Competitions
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  competition:
+                    "$ref": "#/components/schemas/Competition"
+                required:
+                - competition
+        '400':
+          description: " Недопустимые параметры"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                competition:
+                  "$ref": "#/components/schemas/Competition"
+        description: Модель Competition
+    delete:
+      summary: delete competition
+      tags:
+      - Competitions
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+  "/courses":
+    get:
+      summary: list courses
+      tags:
+      - Courses
+      parameters:
+      - name: search
+        in: query
+        required: false
+        description: Строка для поиска ресурса (часть имени, как пример). Игнорируется
+          если указан filter
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: Ограничение кол-ва записей на странице.(100)
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        description: Номер страницы
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        required: false
+        description: Поле по которому производится сортировка.
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        description: Направление сортировки [asc | desc]. По умолчанию asc. Игнорируется
+          если указан order
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - courses
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/Course"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    post:
+      summary: create course
+      tags:
+      - Courses
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - course
+                properties:
+                  course:
+                    "$ref": "#/components/schemas/Course"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course:
+                  "$ref": "#/components/schemas/Course"
+        description: Модель Course
+  "/courses/{id}":
+    get:
+      summary: show course
+      tags:
+      - Courses
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course:
+                    "$ref": "#/components/schemas/Course"
+                required:
+                - course
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+    patch:
+      summary: update course
+      tags:
+      - Courses
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course:
+                    "$ref": "#/components/schemas/Course"
+                required:
+                - course
+        '400':
+          description: " Недопустимые параметры"
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+        '422':
+          description: Недопустимая модель ресурса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course:
+                  "$ref": "#/components/schemas/Course"
+        description: Модель Course
+    delete:
+      summary: delete course
+      tags:
+      - Courses
+      parameters:
+      - name: id
+        description: Идентификатор
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: Учетная запись не авторизована
+        '403':
+          description: Нет прав доступа к ресурсу
+servers:
+- url: http://{host}:{port}
+  description: Development server
+  variables:
+    host:
+      default: localhost
+    port:
+      default: '3000'

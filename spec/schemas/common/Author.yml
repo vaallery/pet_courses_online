@@ -1,0 +1,30 @@
+required: [id,name,description,active,created_at,updated_at,course_ids]
+properties:
+  id:
+    description: ''
+    readOnly: true
+    type: number
+  name:
+    description: ''
+    type: string
+  description:
+    description: ''
+    type: [string, 'null']
+  active:
+    description: ''
+    type: boolean
+  created_at:
+    description: ''
+    readOnly: true
+    type: string
+    format: date-time
+  updated_at:
+    description: ''
+    readOnly: true
+    type: string
+    format: date-time
+  course_ids:
+    type: array
+    readOnly: true
+    items:
+      type: integer

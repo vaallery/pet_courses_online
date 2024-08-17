@@ -1,0 +1,2 @@
+class CompetitionsFilter < BaseFilter
+end
